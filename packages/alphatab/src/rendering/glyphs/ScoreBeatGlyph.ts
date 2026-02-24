@@ -313,6 +313,18 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             steps -= 2;
         }
 
+        // Percussion voice 2 (kick/feet): place rests below the staff
+        // to avoid collision with voice 1 notes (snare, hi-hat).
+        // Position at 1 space below the bottom staff line.
+        if (
+            this.renderer.bar.staff.isPercussion &&
+            this.renderer.bar.isMultiVoice &&
+            this.container.beat.voice.index > 0
+        ) {
+            const lineCount = this.renderer.bar.staff.standardNotationLineCount;
+            steps = (lineCount - 1) * 2 + 2;
+        }
+
         const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
         this.restGlyph = restGlyph;
         restGlyph.beat = this.container.beat;

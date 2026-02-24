@@ -1178,9 +1178,26 @@ export class PercussionMapper {
             PercussionMapper._articulationsByOutputNumber = articulationsByOutputNumber;
         }
 
-        return articulationsByOutputNumber.has(articulation.outputMidiNumber)
-            ? articulationsByOutputNumber.get(articulation.outputMidiNumber)!.id
-            : -1;
+        if (articulationsByOutputNumber.has(articulation.outputMidiNumber)) {
+            const known = articulationsByOutputNumber.get(articulation.outputMidiNumber)!;
+            // Copy visual properties from the known articulation when they
+            // are not yet set on the imported one (MusicXML importer creates
+            // articulations with MusicFontSymbol.None for all note heads).
+            if (articulation.noteHeadDefault === MusicFontSymbol.None) {
+                articulation.noteHeadDefault = known.noteHeadDefault;
+            }
+            if (articulation.noteHeadHalf === MusicFontSymbol.None) {
+                articulation.noteHeadHalf = known.noteHeadHalf;
+            }
+            if (articulation.noteHeadWhole === MusicFontSymbol.None) {
+                articulation.noteHeadWhole = known.noteHeadWhole;
+            }
+            if (articulation.techniqueSymbol === MusicFontSymbol.None) {
+                articulation.techniqueSymbol = known.techniqueSymbol;
+            }
+            return known.id;
+        }
+        return -1;
     }
 
     private static _instrumentArticulationsByUniqueId: Map<string, InstrumentArticulation> | undefined;

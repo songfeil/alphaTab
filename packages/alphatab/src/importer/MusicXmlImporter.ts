@@ -2459,6 +2459,18 @@ export class MusicXmlImporter extends ScoreImporter {
             if (isChord) {
                 beat = this._lastBeat!;
                 beat!.addNote(note!);
+
+                // Set percussionArticulation for chord notes too
+                // (same logic as for non-chord notes below)
+                if (note !== null) {
+                    note!.isVisible = noteIsVisible;
+                    const trackInfo = this._indexToTrackInfo.get(track.index)!;
+                    if (instrumentId !== null) {
+                        note!.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId!, note!);
+                    } else if (!isPitched) {
+                        note!.percussionArticulation = trackInfo.getOrCreateArticulation('', note!);
+                    }
+                }
                 return;
             }
 
