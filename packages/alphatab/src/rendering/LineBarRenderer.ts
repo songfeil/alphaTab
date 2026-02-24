@@ -635,7 +635,17 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
 
         if (this.shouldCreateBarNumber()) {
-            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1));
+            // Subtract anacrusis (pickup) bars so bar numbering starts at 1
+            // for the first non-anacrusis measure.
+            let anacrusisCount = 0;
+            for (const mb of this.bar.staff.track.score.masterBars) {
+                if (mb.isAnacrusis) {
+                    anacrusisCount++;
+                } else {
+                    break;
+                }
+            }
+            this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1 - anacrusisCount));
         } else if (!hasSpaceAfterStartGlyphs) {
             this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
         }
