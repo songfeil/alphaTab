@@ -1487,6 +1487,15 @@ export class AlphaTabApiBase<TSettings> {
 
     public set tickPosition(value: number) {
         this._player.tickPosition = value;
+        // When the player is not actively playing (e.g. external transport driving cursor),
+        // positionChanged event does not fire, so manually trigger cursor update.
+        if (this._player.state !== PlayerState.Playing) {
+            const tick = this._player.tickPosition;
+            this._previousTick = tick;
+            this.uiFacade.beginInvoke(() => {
+                this._cursorUpdateTick(tick, false, 1, false, true);
+            });
+        }
     }
 
     /**
