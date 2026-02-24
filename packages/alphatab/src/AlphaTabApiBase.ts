@@ -2424,6 +2424,14 @@ export class AlphaTabApiBase<TSettings> {
             }
         }
 
+        // When the next beat is in a different bar, cap the cursor target so it doesn't
+        // reach all the way to (or past) the barline. This prevents the cursor from
+        // appearing to be on the next measure before it actually starts.
+        if (!nextBeatBoundings || nextBeatBoundings.barBounds !== beatBoundings.barBounds) {
+            const barRightEdge = barBounds.x + barBounds.w;
+            nextBeatX = Math.min(nextBeatX, barRightEdge - 3);
+        }
+
         let startBeatX = beatBoundings.onNotesX;
         if (beatCursor) {
             const animationWidth = nextBeatX - beatBoundings.onNotesX;
