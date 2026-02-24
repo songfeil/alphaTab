@@ -237,7 +237,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     // move to next bar
                     currentIndex++;
 
-                    if (this._needsLineBreak(currentIndex)) {
+                    if (this._needsLineBreak(renderers!.lastMasterBarIndex)) {
                         system.isFull = true;
                     }
                 } else {
