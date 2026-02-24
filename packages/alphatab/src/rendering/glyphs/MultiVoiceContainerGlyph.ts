@@ -1,6 +1,7 @@
 import { Environment } from '@coderline/alphatab/Environment';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
@@ -61,14 +62,20 @@ export class MultiVoiceContainerGlyph extends Glyph {
     private _scaleToForce(force: number): void {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
         const positions = this.renderer.layoutingInfo.buildOnTimePositions(force);
+        const isSimileMark = this.renderer.bar.simileMark !== SimileMark.None;
         for (const beatGlyphs of this.beatGlyphs.values()) {
             for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
                 const currentBeatGlyph = beatGlyphs[i];
 
                 switch (currentBeatGlyph.graceType) {
                     case GraceType.None:
-                        currentBeatGlyph.x =
-                            positions.get(currentBeatGlyph.absoluteDisplayStart)! - currentBeatGlyph.onTimeX;
+                        if (isSimileMark && !positions.has(currentBeatGlyph.absoluteDisplayStart)) {
+                            // For simile bars, beats without springs are evenly distributed
+                            currentBeatGlyph.x = (this.width / j) * i;
+                        } else {
+                            currentBeatGlyph.x =
+                                positions.get(currentBeatGlyph.absoluteDisplayStart)! - currentBeatGlyph.onTimeX;
+                        }
                         break;
                     default:
                         const graceDisplayStart = currentBeatGlyph.graceGroup!.beats[0].absoluteDisplayStart;

@@ -1095,11 +1095,9 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _clearBar(bar: Bar) {
-        for (const v of bar.voices) {
-            const emptyBeat: Beat = new Beat();
-            emptyBeat.isEmpty = true;
-            v.addBeat(emptyBeat);
-        }
+        // Keep the beats in the model for MIDI playback and cursor positioning.
+        // The renderer skips individual beat glyphs for bars with simileMark set
+        // and only paints the simile symbol (%, %%).
     }
 
     private _parseBarLine(element: XmlNode, masterBar: MasterBar, track: Track) {

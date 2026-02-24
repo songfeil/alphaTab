@@ -2,6 +2,7 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { GraceGroup } from '@coderline/alphatab/model/GraceGroup';
 import type { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -163,6 +164,17 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
+        // For simile mark bars, only register a spring for the first beat
+        // so the bar is drawn short (only the % symbol is visible).
+        // Skipping springs for subsequent beats keeps bar width minimal.
+        if (this.beat.voice.bar.simileMark !== SimileMark.None) {
+            if (this.beat.voice.beats.length > 0 && this.beat.voice.beats[0].id === this.beat.id) {
+                layoutings.addBeatSpring(this, 0, 0);
+                layoutings.setBeatSizes(this, { preBeatSize: 0, onBeatSize: 0 });
+            }
+            return;
+        }
+
         const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.onTimeX;
 
         let postBeatStretch: number = this.postBeatStretch;
@@ -286,6 +298,12 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
 
         const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this._ties.length === 0;
         if (isEmptyGlyph) {
+            return;
+        }
+        // Simile mark bars: skip painting notes/ties (the % symbol is
+        // painted separately by paintSimileMark). Beat glyphs are still
+        // created for layout and bounds registration (cursor positioning).
+        if (this.beat.voice.bar.simileMark !== SimileMark.None) {
             return;
         }
         canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));

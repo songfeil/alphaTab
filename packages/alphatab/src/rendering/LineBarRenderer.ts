@@ -3,6 +3,7 @@ import type { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatBeamingMode, type BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
@@ -492,7 +493,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     protected shouldPaintBeamingHelper(h: BeamingHelper) {
-        return !h.isRestBeamHelper;
+        if (h.isRestBeamHelper) {
+            return false;
+        }
+        // Skip stems/beams/flags for simile (measure repeat) bars
+        if (h.voice && h.voice.bar.simileMark !== SimileMark.None) {
+            return false;
+        }
+        return true;
     }
 
     protected abstract getFlagTopY(beat: Beat, direction: BeamDirection): number;
