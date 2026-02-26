@@ -38,7 +38,15 @@ export enum EffectBandMode {
      *
      * If no visible render follows, they are added to the bottom of the previous visible renderer.
      */
-    SharedBottom = 3
+    SharedBottom = 3,
+
+    /**
+     * Voice-aware bottom placement for multi-voice scores.
+     * Single voice: bottom only (same as SharedBottom).
+     * Multi-voice: voice 0 (stems up) on top, voice 1+ (stems down) on bottom.
+     * Shared fallback: treated as SharedBottom when the owning renderer is not visible.
+     */
+    VoiceAwareBottom = 4
 }
 
 /**

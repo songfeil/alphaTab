@@ -434,10 +434,20 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;
         const aboveBeatEffects = this.noteHeads!.aboveBeatEffects;
-        const outsideBeatEffects: Map<string, EffectGlyph> =
-            sr.getBeatDirection(this.container.beat) === BeamDirection.Up
+        const direction = sr.getBeatDirection(this.container.beat);
+        const isMultiVoice = this.container.beat.voice.bar.isMultiVoice;
+        // Single voice: articulations on notehead side (opposite stem)
+        // Multi-voice: articulations on stem side to avoid collision between voices
+        let outsideBeatEffects: Map<string, EffectGlyph>;
+        if (isMultiVoice) {
+            outsideBeatEffects = direction === BeamDirection.Up
+                ? this.noteHeads!.aboveBeatEffects
+                : this.noteHeads!.belowBeatEffects;
+        } else {
+            outsideBeatEffects = direction === BeamDirection.Up
                 ? this.noteHeads!.belowBeatEffects
                 : this.noteHeads!.aboveBeatEffects;
+        }
 
         if (n.isStaccato && !belowBeatEffects.has('Staccato')) {
             outsideBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));

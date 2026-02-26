@@ -44,6 +44,7 @@ export class DynamicsEffectInfo extends EffectInfo {
         const previousBeat = this._getPreviousDynamicsBeat(beat);
 
         let show: boolean = (beat.voice.index === 0 && !previousBeat) || beat.dynamics !== previousBeat?.dynamics;
+
         // ensure we do not show duplicate dynamics
         if (show && beat.voice.index > 0) {
             for (const voice of beat.voice.bar.voices) {

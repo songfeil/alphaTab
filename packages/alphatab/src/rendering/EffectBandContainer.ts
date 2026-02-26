@@ -1,7 +1,7 @@
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandSizingInfo } from '@coderline/alphatab/rendering/EffectBandSizingInfo';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
@@ -62,6 +62,20 @@ export class EffectBandContainer {
         for (const info of this.infos) {
             if (!notationSettings.isNotationElementVisible(info.effect.notationElement)) {
                 continue;
+            }
+
+            // VoiceAwareBottom: filter by voice index and container position
+            // Percussion: always bottom (single set of dynamics for the whole kit)
+            // Non-percussion multi-voice: voice 0 → top, voice 1+ → bottom
+            if (info.mode === EffectBandMode.VoiceAwareBottom) {
+                const isMultiVoice = voice.bar.isMultiVoice;
+                if (isMultiVoice && !voice.bar.staff.isPercussion) {
+                    if (this._isTopContainer && voice.index > 0) { i++; continue; }
+                    if (!this._isTopContainer && voice.index === 0) { i++; continue; }
+                } else {
+                    // single voice OR percussion → bottom only
+                    if (this._isTopContainer) { i++; continue; }
+                }
             }
 
             let band: EffectBand | undefined = undefined;

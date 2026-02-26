@@ -97,6 +97,11 @@ export class RenderStaff {
                 case EffectBandMode.SharedBottom:
                     this.bottomEffectInfos.push(b);
                     break;
+
+                case EffectBandMode.VoiceAwareBottom:
+                    this.topEffectInfos.push(b);
+                    this.bottomEffectInfos.push(b);
+                    break;
             }
         }
 

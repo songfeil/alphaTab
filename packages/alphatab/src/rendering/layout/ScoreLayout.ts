@@ -390,6 +390,7 @@ export abstract class ScoreLayout {
                                     sharedTopEffects.push(e);
                                     break;
                                 case EffectBandMode.SharedBottom:
+                                case EffectBandMode.VoiceAwareBottom:
                                     sharedBottomEffects.push(e);
                                     break;
                             }

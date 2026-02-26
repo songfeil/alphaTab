@@ -523,10 +523,10 @@ export class Environment {
             { effect: new GolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop },
 
             { effect: new GolpeEffectInfo(GolpeType.Thumb), mode: EffectBandMode.OwnedBottom },
-            { effect: new CrescendoEffectInfo(), mode: EffectBandMode.SharedBottom },
+            { effect: new CrescendoEffectInfo(), mode: EffectBandMode.VoiceAwareBottom },
             // NOTE: all octave signs are currently shown above, but 8vb could be shown as 8va below the staff
             // { effect: new OttaviaEffectInfo(false), mode: EffectBandMode.SharedBottom },
-            { effect: new DynamicsEffectInfo(), mode: EffectBandMode.SharedBottom },
+            { effect: new DynamicsEffectInfo(), mode: EffectBandMode.VoiceAwareBottom },
             { effect: new SustainPedalEffectInfo(), mode: EffectBandMode.SharedBottom }
         ]),
 

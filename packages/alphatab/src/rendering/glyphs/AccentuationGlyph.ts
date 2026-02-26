@@ -38,9 +38,13 @@ export class AccentuationGlyph extends EffectGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const dir = (this.renderer as LineBarRenderer).getBeatDirection(this._note.beat);
-        const symbol = AccentuationGlyph._getSymbol(this._note.accentuated, dir === BeamDirection.Down);
+        const isMultiVoice = this._note.beat.voice.bar.isMultiVoice;
+        // Single voice: articulations on notehead side (opposite stem) → Down=above, Up=below
+        // Multi-voice: articulations on stem side → Up=above, Down=below
+        const above = isMultiVoice ? (dir === BeamDirection.Up) : (dir === BeamDirection.Down);
+        const symbol = AccentuationGlyph._getSymbol(this._note.accentuated, above);
 
-        const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height;
-        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, y, 1, symbol, true);
+        const y = above ? cy + this.y + this.height : cy + this.y;
+        CanvasHelper.fillMusicFontSymbolSafe(canvas, cx + this.x, y, 1, symbol, true);
     }
 }
