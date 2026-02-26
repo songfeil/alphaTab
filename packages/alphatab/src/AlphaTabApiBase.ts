@@ -2424,12 +2424,13 @@ export class AlphaTabApiBase<TSettings> {
             }
         }
 
-        // When the next beat is in a different bar, cap the cursor target so it doesn't
-        // reach all the way to (or past) the barline. This prevents the cursor from
-        // appearing to be on the next measure before it actually starts.
-        if (!nextBeatBoundings || nextBeatBoundings.barBounds !== beatBoundings.barBounds) {
-            const barRightEdge = barBounds.x + barBounds.w;
-            nextBeatX = Math.min(nextBeatX, barRightEdge - 3);
+        // When the next beat is in a different bar (or doesn't exist), set the cursor
+        // target to the current bar's right edge. This ensures the cursor animates across
+        // the full bar width — important for simile (measure-repeat) bars where beat
+        // realBounds may be narrower than the visual bar, and when the next bar wraps
+        // to a new staff system line (e.g. on narrow screens like iPhone).
+        if (!nextBeatBoundings || nextBeatBoundings.barBounds.masterBarBounds !== beatBoundings.barBounds.masterBarBounds) {
+            nextBeatX = barBounds.x + barBounds.w - 3;
         }
 
         let startBeatX = beatBoundings.onNotesX;
