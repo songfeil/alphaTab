@@ -3,6 +3,7 @@ import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { BoxedMarkerGlyph } from '@coderline/alphatab/rendering/glyphs/BoxedMarkerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -38,15 +39,14 @@ export class MarkerEffectInfo extends EffectInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new TextGlyph(
-            0,
-            0,
-            !beat.voice.bar.masterBar.section!.marker
-                ? beat.voice.bar.masterBar.section!.text
-                : `[${beat.voice.bar.masterBar.section!.marker}] ${beat.voice.bar.masterBar.section!.text}`,
-            renderer.resources.elementFonts.get(NotationElement.EffectMarker)!,
-            TextAlign.Left
-        );
+        const section = beat.voice.bar.masterBar.section!;
+        const font = renderer.resources.elementFonts.get(NotationElement.EffectMarker)!;
+
+        if (section.marker) {
+            return new BoxedMarkerGlyph(0, 0, section.marker, section.text, font, TextAlign.Left);
+        }
+
+        return new TextGlyph(0, 0, section.text, font, TextAlign.Left);
     }
 
     public canExpand(_from: Beat, _to: Beat): boolean {
